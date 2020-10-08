@@ -1,6 +1,6 @@
 {
   "name": "@whppt/sitemaps",
-  "version": "0.0.1",
+  "version": "1.0.0-rc1",
   "description": "",
   "repository": "whpptjs/sitemaps",
   "license": "MIT",
@@ -40,7 +40,6 @@
     "standard-version": "latest"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/",
     "access": "public"
   }
 }
