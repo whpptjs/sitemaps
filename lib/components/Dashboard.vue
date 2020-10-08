@@ -1,6 +1,6 @@
 <template>
   <div class="whppt-dashboard__sitemap">
-    <div class="flex">
+    <div class="whppt-sitemap__filters">
       <whppt-input
         id="dashboard-filter-slug"
         v-model="filters.slug"
@@ -145,7 +145,7 @@ export default {
 .whppt-dashboard__sitemap {
   padding: 1rem;
 
-  .flex {
+  .whppt-sitemap__filters {
     display: flex;
     align-items: center;
 
@@ -156,6 +156,7 @@ export default {
 
   .whppt-dashboard__filter {
     margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 </style>
