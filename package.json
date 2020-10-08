@@ -1,6 +1,6 @@
 {
   "name": "@whppt/sitemaps",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "repository": "whpptjs/sitemaps",
   "license": "MIT",
@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "nuxt example",
     "lint": "eslint --ext .js,.vue .",
-    "release": "yarn test && standard-version && git push --follow-tags && npm publish",
+    "release": "standard-version && git push --follow-tags && npm publish",
     "test": "yarn lint && jest"
   },
   "dependencies": {
