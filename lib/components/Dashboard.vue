@@ -1,62 +1,99 @@
 <template>
-  <div class="whppt-dashboard__sitemap">
-    <div class="whppt-sitemap__filters">
-      <whppt-input
-        id="dashboard-filter-slug"
-        v-model="filters.slug"
-        class="whppt-dashboard__filter"
-        label="Slug"
-        placeholder="/about"
-        @input="fetchSitemap"
-      ></whppt-input>
-      <whppt-input
-        id="dashboard-filter-page-type"
-        v-model="filters.pageType"
-        class="whppt-dashboard__filter"
-        label="Page Type"
-        placeholder="Generic"
-        @input="fetchSitemap"
-      ></whppt-input>
-      <whppt-select
-        id="dashboard-filter-frequency"
-        v-model="filters.frequency"
-        class="whppt-dashboard__filter"
-        label="Frequency"
-        placeholder="All"
-        :items="frequencies"
-        @change="fetchSitemap"
-      ></whppt-select>
-      <whppt-input
-        id="dashboard-filter-lastmod"
-        class="whppt-dashboard__filter"
-        label="Last Modified"
-        placeholder="eg. 11/11/2020"
-      ></whppt-input>
-      <whppt-input
-        id="dashboard-filter-priority"
-        class="whppt-dashboard__filter"
-        label="Priority"
-        placeholder="eg. 1"
-      ></whppt-input>
+  <div class="whppt-dashboard__wrapper">
+    <div class="whppt-dashboard__sitemap">
+      <div class="whppt-filters-wrapper">
+        <whppt-button class="whppt-filters-button" @click="filtersVisible = true">Show Filters</whppt-button>
+      </div>
+      <whppt-table
+        :headers="headers"
+        :items="items"
+        dense
+        :page.sync="page"
+        :per-page.sync="size"
+        :total="total"
+        @update:page="fetchSitemap"
+        @update:perPage="fetchSitemap"
+      >
+        <template v-slot:item.slug="{ item }">
+          <a class="whppt-sitemap__slug" href="javascript:void(0);" @click="viewPage(item.slug)">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              aria-hidden="true"
+              focusable="false"
+              role="img"
+              width="1rem"
+              height="1rem"
+              preserveAspectRatio="xMidYMid meet"
+              viewBox="0 0 24 24"
+              style="transform: rotate(360deg)"
+            >
+              <path
+                d="M14 3v2h3.59l-9.83 9.83l1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7z"
+                fill="currentColor"
+              ></path>
+            </svg>
+            {{ item.slug }}
+          </a>
+        </template>
+      </whppt-table>
     </div>
-    <whppt-table
-      :headers="headers"
-      :items="items"
-      dense
-      :page.sync="page"
-      :per-page.sync="size"
-      :total="total"
-      @update:page="fetchSitemap"
-      @update:perPage="fetchSitemap"
-    ></whppt-table>
+    <whppt-drawer :active="filtersVisible" position="right">
+      <div class="whppt-sitemap__filters">
+        <div class="whppt-filters-wrapper">
+          <whppt-button class="whppt-filters-button" @click="filtersVisible = false">Hide Filters</whppt-button>
+        </div>
+        <whppt-input
+          id="dashboard-filter-slug"
+          v-model="filters.slug"
+          class="whppt-dashboard__filter"
+          label="Slug"
+          placeholder="/about"
+          @input="fetchSitemap"
+        ></whppt-input>
+        <whppt-select
+          id="dashboard-filter-page-type"
+          v-model="filters.pageType"
+          class="whppt-dashboard__filter"
+          :items="pageTypes"
+          label="Page Type"
+          placeholder="All Page Types"
+          @input="fetchSitemap"
+        ></whppt-select>
+        <whppt-select
+          id="dashboard-filter-frequency"
+          v-model="filters.frequency"
+          class="whppt-dashboard__filter"
+          label="Frequency"
+          placeholder="All Frequencies"
+          :items="frequencies"
+          @change="fetchSitemap"
+        ></whppt-select>
+        <whppt-input
+          id="dashboard-filter-priority"
+          v-model="filters.priority"
+          class="whppt-dashboard__filter"
+          label="Priority"
+          placeholder="eg. 1"
+          type="number"
+          min="0"
+          max="1"
+          step="0.1"
+          @input="fetchSitemap"
+        ></whppt-input>
+      </div>
+    </whppt-drawer>
   </div>
 </template>
 
 <script>
+import { map, filter, isNil } from 'lodash';
 import WhpptTable from '@whppt/nuxt/lib/components/ui/Table.vue';
 import WhpptButton from '@whppt/nuxt/lib/components/ui/Button.vue';
 import WhpptInput from '@whppt/nuxt/lib/components/ui/Input.vue';
+import WhpptNumberInput from '@whppt/nuxt/lib/components/ui/NumberInput.vue';
 import WhpptSelect from '@whppt/nuxt/lib/components/ui/Select.vue';
+import WhpptDrawer from '@whppt/nuxt/lib/components/ui/Drawer.vue';
 
 export default {
   name: 'SitemapDashboard',
@@ -64,12 +101,15 @@ export default {
     WhpptTable,
     WhpptButton,
     WhpptInput,
+    WhpptNumberInput,
     WhpptSelect,
+    WhpptDrawer,
   },
   created() {
     this.fetchSitemap();
   },
   data: () => ({
+    filtersVisible: false,
     sitemap: undefined,
     page: 1,
     size: 10,
@@ -84,6 +124,7 @@ export default {
       frequency: undefined,
       slug: '',
       pageType: '',
+      priority: undefined,
     },
     headers: [
       { text: 'Slug', align: 'start', value: 'slug' },
@@ -108,9 +149,10 @@ export default {
   computed: {
     items() {
       if (!this.sitemap) return [];
-      return this.sitemap.map(page => ({
+
+      return map(this.sitemap, page => ({
         slug: page.slug || '/',
-        pageType: page.pageType ? page.pageType.name : page.pageType,
+        pageType: page.pageType,
         lastmod: page.updatedAt,
         lastpub: page.publishedAt || 'Not set',
         published: Boolean(page.published),
@@ -118,6 +160,12 @@ export default {
         changefreq: page.frequency || 'Not set',
         priority: page.priority || 'Not set',
       }));
+    },
+    pageTypes() {
+      return filter(
+        map(this.$whppt.plugins, plugin => plugin.pageType && plugin.pageType.name),
+        p => !isNil(p)
+      );
     },
   },
   methods: {
@@ -130,6 +178,7 @@ export default {
             freq: this.filters.frequency,
             slug: this.filters.slug || undefined,
             pageType: this.filters.pageType || undefined,
+            priority: this.filters.priority || undefined,
           },
         })
         .then(({ sitemap, total }) => {
@@ -137,26 +186,54 @@ export default {
           this.total = total;
         });
     },
+    viewPage(slug) {
+      this.$emit('closed');
+      this.$router.push(slug);
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+$primary-600: #5a67d8;
+
+.whppt-dashboard__wrapper {
+  display: flex;
+}
+
+.whppt-sitemap__filters {
+  padding: 1rem;
+}
+
 .whppt-dashboard__sitemap {
   padding: 1rem;
-
-  .whppt-sitemap__filters {
-    display: flex;
-    align-items: center;
-
-    button {
-      margin-left: 0.5rem;
-    }
-  }
 
   .whppt-dashboard__filter {
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
   }
+}
+
+.whppt-sitemap__slug {
+  display: flex;
+
+  svg {
+    margin-right: 0.5rem;
+  }
+
+  &:hover,
+  &:focus {
+    color: $primary-600;
+    text-decoration: underline;
+  }
+}
+
+.whppt-filters-wrapper {
+  width: 100%;
+}
+
+.whppt-filters-button {
+  margin-left: auto;
+  margin-bottom: 0.5rem;
 }
 </style>

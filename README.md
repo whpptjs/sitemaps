@@ -2,15 +2,22 @@
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![Github Actions CI][github-actions-ci-src]][github-actions-ci-href]
-[![Codecov][codecov-src]][codecov-href]
 [![License][license-src]][license-href]
-
-> 
 
 [📖 **Release Notes**](./CHANGELOG.md)
 
-## Setup
+## Table of Contents
+
+- [Features](#features)
+- [Usage](#usage)
+- [Options](#options)
+- [License](#license)
+
+## Features
+- Sitemaps API queries.
+- Sitemaps viewing tool, available in the dashboard.
+
+## Usage
 
 1. Add `@whppt/sitemaps` dependency to your project
 
@@ -18,7 +25,7 @@
 yarn add @whppt/sitemaps # or npm install @whppt/sitemaps
 ```
 
-2. Add `@whppt/sitemaps` to the `modules` section of `nuxt.config.js`
+2. Add `@whppt/sitemaps` to the `modules` section of `nuxt.config.js`  
 
 ```js
 {
@@ -32,17 +39,31 @@ yarn add @whppt/sitemaps # or npm install @whppt/sitemaps
 }
 ```
 
-## Development
+*note: nuxt modules loads modules in a reverse order, make sure to play any whppt modules before the @whppt/nuxt module*
 
-1. Clone this repository
-2. Install dependencies using `yarn install` or `npm install`
-3. Start development server using `npm run dev`
+3. Register the serverModule with `@whppt/api-express`, update your `~/server/index.js` file to include.
+```js
+const { serverModule } = require('@whppt/sitemaps');
+// require any plugins that contain their own pageTypes like so
+const myPlugin = require('./path/to/my/plugin.js').default;
+
+const options = {
+  modules: {
+    // any other custom modules go here..
+    sitemap: { filter: serverModule },
+  },
+  // pageTypes is required to tell the sitemaps query about all
+  // of your custom pageTypes.
+  pageTypes: [myPlugin.pageType, /* Any other pageTypes you want the sitemaps module to be aware of */] 
+}
+```
+
+## Options
+coming soon...
 
 ## License
 
 [MIT License](./LICENSE)
-
-Copyright (c) lucasjm <lucas@sveltestudios.com>
 
 <!-- Badges -->
 [npm-version-src]: https://img.shields.io/npm/v/@whppt/sitemaps/latest.svg
