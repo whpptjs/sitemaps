@@ -2,7 +2,9 @@
   <div class="whppt-dashboard__wrapper">
     <div class="whppt-dashboard__sitemap">
       <div class="whppt-filters-wrapper">
-        <whppt-button class="whppt-filters-button" @click="filtersVisible = true">Show Filters</whppt-button>
+        <whppt-button v-if="!filtersVisible" class="whppt-filters-button" @click="filtersVisible = true">
+          Show Filters
+        </whppt-button>
       </div>
       <whppt-table
         :headers="headers"
@@ -49,6 +51,7 @@
           class="whppt-dashboard__filter"
           label="Slug"
           placeholder="/about"
+          clearable
           @input="fetchSitemap"
         ></whppt-input>
         <whppt-select
@@ -81,6 +84,23 @@
           step="0.1"
           @input="fetchSitemap"
         ></whppt-input>
+        <div style="display: flex">
+          <whppt-date-picker
+            v-model="filters.lastModFrom"
+            label="Last Modified From"
+            placeholder="Select a date"
+            :max-date="filters.lastModTo ? filters.lastModTo : undefined"
+            @input="fetchSitemap"
+          ></whppt-date-picker>
+          <whppt-spacer :width="1"></whppt-spacer>
+          <whppt-date-picker
+            v-model="filters.lastModTo"
+            label="Last Modified To"
+            placeholder="Select a date"
+            :min-date="filters.lastModFrom ? filters.lastModFrom : undefined"
+            @input="fetchSitemap"
+          ></whppt-date-picker>
+        </div>
       </div>
     </whppt-drawer>
   </div>
@@ -94,6 +114,8 @@ import WhpptInput from '@whppt/nuxt/lib/components/ui/Input.vue';
 import WhpptNumberInput from '@whppt/nuxt/lib/components/ui/NumberInput.vue';
 import WhpptSelect from '@whppt/nuxt/lib/components/ui/Select.vue';
 import WhpptDrawer from '@whppt/nuxt/lib/components/ui/Drawer.vue';
+import WhpptSpacer from '@whppt/nuxt/lib/components/ui/Spacer.vue';
+import WhpptDatePicker from '@whppt/nuxt/lib/components/ui/Datepicker.vue';
 
 export default {
   name: 'SitemapDashboard',
@@ -104,6 +126,8 @@ export default {
     WhpptNumberInput,
     WhpptSelect,
     WhpptDrawer,
+    WhpptSpacer,
+    WhpptDatePicker,
   },
   created() {
     this.fetchSitemap();
@@ -125,6 +149,8 @@ export default {
       slug: '',
       pageType: '',
       priority: undefined,
+      lastModFrom: undefined,
+      lastModTo: undefined,
     },
     headers: [
       { text: 'Slug', align: 'start', value: 'slug' },
@@ -179,6 +205,8 @@ export default {
             slug: this.filters.slug || undefined,
             pageType: this.filters.pageType || undefined,
             priority: this.filters.priority || undefined,
+            lastModTo: this.filters.lastModTo || undefined,
+            lastModFrom: this.filters.lastModFrom || undefined,
           },
         })
         .then(({ sitemap, total }) => {
@@ -188,7 +216,7 @@ export default {
     },
     viewPage(slug) {
       this.$emit('closed');
-      this.$router.push(slug);
+      this.$router.push(slug.startsWith('/') ? slug : `/${slug}`);
     },
   },
 };
@@ -207,6 +235,7 @@ $primary-600: #5a67d8;
 
 .whppt-dashboard__sitemap {
   padding: 1rem;
+  width: 100%;
 
   .whppt-dashboard__filter {
     margin-right: 0.5rem;
@@ -229,6 +258,7 @@ $primary-600: #5a67d8;
 }
 
 .whppt-filters-wrapper {
+  min-height: 3rem;
   width: 100%;
 }
 
