@@ -13,8 +13,8 @@
         :page.sync="page"
         :per-page.sync="size"
         :total="total"
-        @update:page="fetchSitemap"
-        @update:perPage="fetchSitemap"
+        @update:page="fetchSitemap()"
+        @update:perPage="fetchSitemap(true)"
       >
         <template v-slot:item.slug="{ item }">
           <a class="whppt-sitemap__slug" href="javascript:void(0);" @click="viewPage(item.slug)">
@@ -38,6 +38,18 @@
             {{ item.slug }}
           </a>
         </template>
+        <template v-slot:item.published="{ item }">
+          <component
+            :is="item.published ? 'check-icon' : 'close-icon'"
+            :style="`color: ${item.published ? 'green' : 'red'}`"
+          />
+        </template>
+        <template v-slot:item.canPublish="{ item }">
+          <component
+            :is="item.canPublish ? 'check-icon' : 'close-icon'"
+            :style="`color: ${item.canPublish ? 'green' : 'red'}`"
+          />
+        </template>
       </whppt-table>
     </div>
     <whppt-drawer :active="filtersVisible" position="right">
@@ -52,7 +64,7 @@
           label="Slug"
           placeholder="/about"
           clearable
-          @input="fetchSitemap"
+          @input="fetchSitemap(true)"
         ></whppt-input>
         <whppt-select
           id="dashboard-filter-page-type"
@@ -61,7 +73,7 @@
           :items="pageTypes"
           label="Page Type"
           placeholder="All Page Types"
-          @input="fetchSitemap"
+          @input="fetchSitemap(true)"
         ></whppt-select>
         <whppt-select
           id="dashboard-filter-frequency"
@@ -70,7 +82,7 @@
           label="Frequency"
           placeholder="All Frequencies"
           :items="frequencies"
-          @change="fetchSitemap"
+          @change="fetchSitemap(true)"
         ></whppt-select>
         <whppt-input
           id="dashboard-filter-priority"
@@ -82,15 +94,24 @@
           min="0"
           max="1"
           step="0.1"
-          @input="fetchSitemap"
+          @input="fetchSitemap(true)"
         ></whppt-input>
+        <whppt-select
+          id="dashboard-filter-publishable"
+          class="whppt-dashboard__filter"
+          v-model="filters.publishableByYou"
+          :items="publishableByYouOptions"
+          label="Publishable By You"
+          placeholder="Any"
+          @input="fetchSitemap(true)"
+        ></whppt-select>
         <div style="display: flex">
           <whppt-date-picker
             v-model="filters.lastModFrom"
             label="Last Modified From"
             placeholder="Select a date"
             :max-date="filters.lastModTo ? filters.lastModTo : undefined"
-            @input="fetchSitemap"
+            @input="fetchSitemap(true)"
           ></whppt-date-picker>
           <whppt-spacer :width="1"></whppt-spacer>
           <whppt-date-picker
@@ -98,7 +119,7 @@
             label="Last Modified To"
             placeholder="Select a date"
             :min-date="filters.lastModFrom ? filters.lastModFrom : undefined"
-            @input="fetchSitemap"
+            @input="fetchSitemap(true)"
           ></whppt-date-picker>
         </div>
       </div>
@@ -117,6 +138,9 @@ import WhpptDrawer from '@whppt/nuxt/lib/components/ui/Drawer.vue';
 import WhpptSpacer from '@whppt/nuxt/lib/components/ui/Spacer.vue';
 import WhpptDatePicker from '@whppt/nuxt/lib/components/ui/Datepicker.vue';
 
+import CheckIcon from './Icons/Check';
+import CloseIcon from './Icons/Close';
+
 export default {
   name: 'SitemapDashboard',
   components: {
@@ -128,6 +152,8 @@ export default {
     WhpptDrawer,
     WhpptSpacer,
     WhpptDatePicker,
+    CheckIcon,
+    CloseIcon,
   },
   created() {
     this.fetchSitemap();
@@ -139,18 +165,13 @@ export default {
     size: 10,
     total: 0,
     filters: {
-      // non-existent
-      editedSince: false,
-      publishedSince: false,
-      EditedBy: false,
-      publishedBy: false,
-      // existing
       frequency: undefined,
       slug: '',
       pageType: '',
       priority: undefined,
       lastModFrom: undefined,
       lastModTo: undefined,
+      publishableByYou: undefined,
     },
     headers: [
       { text: 'Slug', align: 'start', value: 'slug' },
@@ -158,7 +179,7 @@ export default {
       { text: 'Last Modified', align: 'start', value: 'lastmod' },
       { text: 'Last Published', align: 'start', value: 'lastpub' },
       { text: 'Currently Published', align: 'start', value: 'published' },
-      { text: 'Publishable by You', align: 'start', value: 'canPublish' },
+      { text: 'Publishable By You', align: 'start', value: 'canPublish' },
       { text: 'Change Frequency', align: 'start', value: 'changefreq' },
       { text: 'Priority', align: 'start', value: 'priority' },
     ],
@@ -182,7 +203,7 @@ export default {
         lastmod: page.updatedAt,
         lastpub: page.publishedAt || 'Not set',
         published: Boolean(page.published),
-        canPublish: page.canAccess,
+        canPublish: page.publishableByYou,
         changefreq: page.frequency || 'Not set',
         priority: page.priority || 'Not set',
       }));
@@ -193,9 +214,17 @@ export default {
         p => !isNil(p)
       );
     },
+    publishableByYouOptions() {
+      return [
+        { text: 'Yes', value: true },
+        { text: 'No', value: false },
+      ];
+    },
   },
   methods: {
-    fetchSitemap() {
+    fetchSitemap(resetPage) {
+      if (resetPage) this.page = 1;
+
       return this.$axios
         .$get(`/api/sitemap/filter`, {
           params: {
@@ -207,6 +236,7 @@ export default {
             priority: this.filters.priority || undefined,
             lastModTo: this.filters.lastModTo || undefined,
             lastModFrom: this.filters.lastModFrom || undefined,
+            publishableByYou: this.filters.publishableByYou || undefined,
           },
         })
         .then(({ sitemap, total }) => {
