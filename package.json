@@ -20,7 +20,8 @@
     "test": "yarn lint && jest"
   },
   "dependencies": {
-    "@whppt/nuxt": "^1.0.42",
+    "@whppt/nuxt": "^2.0.0-rc25",
+    "@whppt/api-express": "^2.0.0-rc14",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
