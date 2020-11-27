@@ -1,6 +1,6 @@
 {
   "name": "@whppt/sitemaps",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "description": "",
   "repository": "whpptjs/sitemaps",
   "license": "MIT",
@@ -20,8 +20,8 @@
     "test": "yarn lint && jest"
   },
   "dependencies": {
-    "@whppt/nuxt": "^2.0.0-rc25",
     "@whppt/api-express": "^2.0.0-rc14",
+    "@whppt/nuxt": "^2.0.0-rc25",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
