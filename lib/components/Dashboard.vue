@@ -98,8 +98,8 @@
         ></whppt-input>
         <whppt-select
           id="dashboard-filter-publishable"
-          class="whppt-dashboard__filter"
           v-model="filters.publishableByYou"
+          class="whppt-dashboard__filter"
           :items="publishableByYouOptions"
           label="Publishable By You"
           placeholder="Any"
@@ -128,15 +128,17 @@
 </template>
 
 <script>
+/* eslint-disable import/no-unresolved */
+
 import { map, filter, isNil } from 'lodash';
-import WhpptTable from '@whppt/nuxt/lib/components/ui/Table.vue';
-import WhpptButton from '@whppt/nuxt/lib/components/ui/Button.vue';
-import WhpptInput from '@whppt/nuxt/lib/components/ui/Input.vue';
-import WhpptNumberInput from '@whppt/nuxt/lib/components/ui/NumberInput.vue';
-import WhpptSelect from '@whppt/nuxt/lib/components/ui/Select.vue';
-import WhpptDrawer from '@whppt/nuxt/lib/components/ui/Drawer.vue';
-import WhpptSpacer from '@whppt/nuxt/lib/components/ui/Spacer.vue';
-import WhpptDatePicker from '@whppt/nuxt/lib/components/ui/Datepicker.vue';
+import WhpptTable from '@whppt/nuxt/lib/components/ui/components/Table.vue';
+import WhpptButton from '@whppt/nuxt/lib/components/ui/components/Button.vue';
+import WhpptInput from '@whppt/nuxt/lib/components/ui/components/Input.vue';
+import WhpptNumberInput from '@whppt/nuxt/lib/components/ui/components/NumberInput.vue';
+import WhpptSelect from '@whppt/nuxt/lib/components/ui/components/Select.vue';
+import WhpptDrawer from '@whppt/nuxt/lib/components/ui/components/Drawer.vue';
+import WhpptSpacer from '@whppt/nuxt/lib/components/ui/components/Spacer.vue';
+import WhpptDatePicker from '@whppt/nuxt/lib/components/ui/components/Datepicker.vue';
 
 import CheckIcon from './Icons/Check';
 import CloseIcon from './Icons/Close';
@@ -154,9 +156,6 @@ export default {
     WhpptDatePicker,
     CheckIcon,
     CloseIcon,
-  },
-  created() {
-    this.fetchSitemap();
   },
   data: () => ({
     filtersVisible: false,
@@ -221,9 +220,14 @@ export default {
       ];
     },
   },
+  created() {
+    this.fetchSitemap();
+  },
   methods: {
     fetchSitemap(resetPage) {
       if (resetPage) this.page = 1;
+
+      console.log(this.filters.publishableByYou);
 
       return this.$axios
         .$get(`/api/sitemap/filter`, {
@@ -236,7 +240,8 @@ export default {
             priority: this.filters.priority || undefined,
             lastModTo: this.filters.lastModTo || undefined,
             lastModFrom: this.filters.lastModFrom || undefined,
-            publishableByYou: this.filters.publishableByYou || undefined,
+            publishableByYou:
+              typeof this.filters.publishableByYou !== 'boolean' ? undefined : this.filters.publishableByYou,
           },
         })
         .then(({ sitemap, total }) => {
