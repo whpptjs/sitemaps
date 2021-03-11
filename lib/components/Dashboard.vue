@@ -227,8 +227,6 @@ export default {
     fetchSitemap(resetPage) {
       if (resetPage) this.page = 1;
 
-      console.log(this.filters.publishableByYou);
-
       return this.$axios
         .$get(`/api/sitemap/filter`, {
           params: {
