@@ -1,6 +1,6 @@
 {
   "name": "@whppt/sitemaps",
-  "version": "1.0.0-rc6",
+  "version": "1.0.0",
   "description": "",
   "repository": "whpptjs/sitemaps",
   "license": "MIT",
@@ -17,12 +17,12 @@
     "dev": "nuxt example",
     "lint": "eslint --ext .js,.vue .",
     "prettier:lint": "prettier --write .",
-    "publish:patch-rc-dry": "yarn build && standard-version --release-as patch --prerelease rc --dry-run",
-    "publish:patch-rc": "yarn build && standard-version --release-as patch --prerelease rc && yarn publish --tag rc && git push --follow-tags",
-    "publish:patch-next": "yarn build && standard-version --release-as patch --prerelease next && yarn publish --tag next && git push --follow-tags",
-    "publish:patch": "yarn build && standard-version --release-as patch && yarn publish && git push --follow-tags",
-    "publish:minor": "yarn build && standard-version --release-as minor && yarn publish && git push --follow-tags",
-    "publish:major": "yarn build && standard-version --release-as major && yarn publish && git push --follow-tags",
+    "publish:patch-rc-dry": "standard-version --release-as patch --prerelease rc --dry-run",
+    "publish:patch-rc": "standard-version --release-as patch --prerelease rc && yarn publish --tag rc && git push --follow-tags",
+    "publish:patch-next": "standard-version --release-as patch --prerelease next && yarn publish --tag next && git push --follow-tags",
+    "publish:patch": "standard-version --release-as patch && yarn publish && git push --follow-tags",
+    "publish:minor": "standard-version --release-as minor && yarn publish && git push --follow-tags",
+    "publish:major": "standard-version --release-as major && yarn publish && git push --follow-tags",
     "test": "yarn lint && jest"
   },
   "dependencies": {
