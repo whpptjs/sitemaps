@@ -17,12 +17,17 @@
     "dev": "nuxt example",
     "lint": "eslint --ext .js,.vue .",
     "prettier:lint": "prettier --write .",
-    "release": "standard-version && git push --follow-tags && npm publish",
+    "publish:patch-rc-dry": "yarn build && standard-version --release-as patch --prerelease rc --dry-run",
+    "publish:patch-rc": "yarn build && standard-version --release-as patch --prerelease rc && yarn publish --tag rc && git push --follow-tags",
+    "publish:patch-next": "yarn build && standard-version --release-as patch --prerelease next && yarn publish --tag next && git push --follow-tags",
+    "publish:patch": "yarn build && standard-version --release-as patch && yarn publish && git push --follow-tags",
+    "publish:minor": "yarn build && standard-version --release-as minor && yarn publish && git push --follow-tags",
+    "publish:major": "yarn build && standard-version --release-as major && yarn publish && git push --follow-tags",
     "test": "yarn lint && jest"
   },
   "dependencies": {
     "@whppt/api-express": "^2.0.0-rc14",
-    "@whppt/nuxt": "^2.0.0-rc25",
+    "@whppt/nuxt": "^2.0.0-rc.85",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
