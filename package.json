@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@whppt/api-express": "^2.0.0-rc14",
-    "@whppt/nuxt": "^2.0.0-rc.85",
+    "@whppt/nuxt": "^2.0.0",
     "lodash": "^4.17.20"
   },
   "devDependencies": {

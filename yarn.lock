@@ -2884,10 +2884,10 @@
     uniqid "^5.2.0"
     uri-js "^4.2.2"
 
-"@whppt/nuxt@^2.0.0-rc.85":
-  version "2.0.0-rc.85"
-  resolved "https://registry.yarnpkg.com/@whppt/nuxt/-/nuxt-2.0.0-rc.85.tgz#d0d7d018d75531808b61642f30e7623c14387f6e"
-  integrity sha512-PEhZ2y0SWCDOjlSSLOe+S+6/yGX+9bMnjlsRLo9d+PbKimaJkm9BG1Q+Ic1yGTl6kt9oc94gyXH7dAwdr1C+Zw==
+"@whppt/nuxt@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@whppt/nuxt/-/nuxt-2.0.0.tgz#16735b9e7b8a08c79029f99343a4f533d57f0c98"
+  integrity sha512-UnRzkSE1ww1B/GJeVklI5pbsFCxSlfqG97DYJtCCe8igu7BsGWWfmI96AJLBY7LzBrFbJuBQD5PdGMVbzlhcGA==
   dependencies:
     "@nuxtjs/toast" "^3.3.0"
     axios "^0.21.1"
